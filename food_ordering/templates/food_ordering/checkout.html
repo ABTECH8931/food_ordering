@@ -1,0 +1,30 @@
+{% extends 'food_ordering/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Checkout</h1>
+    <div class="list-group mb-4">
+        {% for item in order_items %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="me-3">
+                    <h4 class="h6 mb-1">{{ item.menu_item.name }}</h4>
+                    <small class="text-muted">{{ item.menu_item.description|truncatechars:60 }}</small>
+                </div>
+                <div class="text-end">
+                    <span class="d-block text-success">${{ item.subtotal|floatformat:2 }}</span>
+                    <small class="text-muted">{{ item.quantity }} × ${{ item.menu_item.price|floatformat:2 }}</small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="list-group-item text-center py-4">
+            <p>Your order is empty</p>
+        </div>
+        {% endfor %}
+    </div>
+    <form method="post" action="{% url 'food_ordering:checkout' order_id=order.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Submit Order</button>
+    </form>
+</div>
+{% endblock %}

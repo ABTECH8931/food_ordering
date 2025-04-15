@@ -1,0 +1,153 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}Order #{{ order.id }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-receipt me-2"></i>Order #{{ order.id }}
+                        </h2>
+                        <span class="badge bg-light text-dark">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="h5">
+                                <i class="fas fa-user me-2"></i>Customer Details
+                            </h3>
+                            <p class="mb-1"><strong>Name:</strong> {{ order.customer_name|default:"Not provided" }}</p>
+                            {% if order.contact_number %}
+                            <p class="mb-1"><strong>Phone:</strong> {{ order.contact_number }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if order.delivery_address %}
+                            <h3 class="h5">
+                                <i class="fas fa-truck me-2"></i>Delivery Info
+                            </h3>
+                            <div class="bg-light p-2 rounded">
+                                {{ order.delivery_address|linebreaksbr }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h3 class="h5 mb-3">
+                        <i class="fas fa-list-ul me-2"></i>Order Items
+                    </h3>
+                    
+                    <!-- Replace this section with your snippet -->
+                    <div class="list-group mb-4">
+                        {% for item in order_items %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="me-3">
+                                    <h4 class="h6 mb-1">{{ item.menu_item.name }}</h4>
+                                    <small class="text-muted">{{ item.menu_item.description|truncatechars:60 }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="d-block text-success">${{ item.subtotal|floatformat:2 }}</span>
+                                    <small class="text-muted">{{ item.quantity }} × ${{ item.menu_item.price|floatformat:2 }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                {% if item.special_requests %}
+                                <div class="text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i> {{ item.special_requests }}
+                                </div>
+                                {% else %}
+                                <div></div>
+                                {% endif %}
+                                
+                                <form method="post" action="{% url 'food_ordering:update_order_item' item.id %}">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-sm" style="width: 150px;">
+                                        <input type="number" name="quantity" class="form-control" 
+                                               min="1" value="{{ item.quantity }}" aria-label="Quantity">
+                                        <button class="btn btn-outline-primary" type="submit">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                        <a href="{% url 'food_ordering:remove_order_item' item.id %}" class="btn btn-outline-danger btn-sm ms-1">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center py-4">
+                            <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+                            <p class="mb-0">Your order is empty</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded">
+                        <h3 class="h5 mb-0">Order Total:</h3>
+                        <span class="h4 text-success mb-0">${{ order.total_price|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                <a href="{% url 'food_ordering:menu' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-utensils me-1"></i> Continue Shopping
+                </a>
+                
+                {% if order_items %}
+                <div class="btn-group">
+                    <a href="{% url 'food_ordering:checkout' order.id %}" class="btn btn-success">
+                        <i class="fas fa-credit-card me-1"></i> Proceed to Checkout
+                    </a>
+                    <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'food_ordering:submit_order' %}">
+                                <i class="fas fa-check-circle me-1"></i> Submit Order Now
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity input validation
+    document.querySelectorAll('input[name="quantity"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            if (this.value < 1) {
+                this.value = 1;
+                alert('Quantity must be at least 1');
+            }
+        });
+    });
+
+    // Confirm item removal
+    document.querySelectorAll('a[href*="remove_order_item"]').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to remove this item from your order?')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

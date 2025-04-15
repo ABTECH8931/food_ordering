@@ -1,0 +1,105 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}Add {{ menu_item.name }} to Order{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Add "{{ menu_item.name }}" to Order</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Display any form-level errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-md-6">
+                            {% if menu_item.image %}
+                                <img src="{{ menu_item.image.url }}" 
+                                     alt="{{ menu_item.name }}"
+                                     class="img-fluid rounded"
+                                     style="width: 100%; max-height: 300px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 150px;">
+                                    <span class="text-muted">No Image</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h4>{{ menu_item.name }}</h4>
+                            <p class="text-muted">${{ menu_item.price }}</p>
+                            <p>{{ menu_item.description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Corrected form with action URL -->
+                    <form method="post" action="{% url 'food_ordering:add_to_order' menu_item.id %}">
+                        {% csrf_token %}
+                        
+                        <!-- Quantity Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity:</label>
+                            <input type="number" 
+                                   name="{{ form.quantity.name }}" 
+                                   id="{{ form.quantity.id_for_label }}" 
+                                   class="form-control {% if form.quantity.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.quantity.value|default:'1' }}" 
+                                   min="1">
+                            {% if form.quantity.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.quantity.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Special Requests Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.special_requests.id_for_label }}" class="form-label">Special Requests:</label>
+                            <textarea name="{{ form.special_requests.name }}" 
+                                      id="{{ form.special_requests.id_for_label }}" 
+                                      class="form-control {% if form.special_requests.errors %}is-invalid{% endif %}"
+                                      rows="3">{{ form.special_requests.value|default:'' }}</textarea>
+                            {% if form.special_requests.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.special_requests.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-success me-md-2">
+                                <i class="fas fa-cart-plus"></i> Add to Order
+                            </button>
+                            <a href="{% url 'food_ordering:menu' %}" class="btn btn-secondary">
+                                <i class="fas fa-utensils"></i> Back to Menu
+                            </a>
+                        </div>
+                    </form>
+
+                    {% if order %}
+                    <div class="mt-3">
+                        <a href="{% url 'food_ordering:view_order_detail' order.id %}" 
+                           class="btn btn-outline-info">
+                            <i class="fas fa-shopping-cart"></i> View Current Order ({{ order.order_items.count }} items)
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

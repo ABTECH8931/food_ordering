@@ -1,0 +1,41 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}{{ category.name }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'food_ordering:menu' %}">Menu</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold">{{ category.name }}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="lead">{{ category.description }}</p>
+                    <a href="{% url 'food_ordering:category_menu' category.id %}" 
+                       class="btn btn-primary">
+                       View All {{ category.name }} Items
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{% url 'food_ordering:menu' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Full Menu
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

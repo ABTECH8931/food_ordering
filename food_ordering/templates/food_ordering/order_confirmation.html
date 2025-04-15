@@ -1,0 +1,11 @@
+{% extends "food_ordering/base.html" %}  <!-- Adjust if your base template has a different name -->
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success">
+        <h2>Order Confirmed!</h2>
+        <p>Thank you for your order (#{{ order.id }}).</p>
+        <p>Total: ${{ order.total_price|floatformat:2 }}</p>
+        <a href="{% url 'food_ordering:menu' %}" class="btn btn-primary">Back to Menu</a>
+    </div>
+</div>
+{% endblock %}

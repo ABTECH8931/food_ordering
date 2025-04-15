@@ -1,0 +1,121 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}Start New Order | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Start Your Order
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    {{ form.customer_name }}
+                                    <label for="{{ form.customer_name.id_for_label }}">Full Name</label>
+                                    {% if form.customer_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.customer_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="text-muted">How should we address you?</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    {{ form.contact_number }}
+                                    <label for="{{ form.contact_number.id_for_label }}">Phone Number</label>
+                                    {% if form.contact_number.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.contact_number.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.delivery_address }}
+                                <label for="{{ form.delivery_address.id_for_label }}">Delivery Address</label>
+                                {% if form.delivery_address.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.delivery_address.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <small class="text-muted">Where should we deliver your order?</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.special_instructions }}
+                                <label for="{{ form.special_instructions.id_for_label }}">Special Instructions</label>
+                                {% if form.special_instructions.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.special_instructions.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <small class="text-muted">Allergies, dietary restrictions, etc.</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'food_ordering:menu' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-chevron-left me-1"></i> Back to Menu
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-check-circle me-1"></i> Create Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Bootstrap's validation classes
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Format phone number input
+    const phoneField = document.getElementById('{{ form.contact_number.id_for_label }}');
+    if (phoneField) {
+        phoneField.addEventListener('input', function(e) {
+            const x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+});
+</script>
+{% endblock %}

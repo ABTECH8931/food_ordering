@@ -1,0 +1,69 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}{{ category.name }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'food_ordering:menu' %}">Menu</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold">{{ category.name }}</h1>
+            <p class="lead">Explore our delicious {{ category.name|lower }} options</p>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for item in menu_items %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-utensils fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text text-muted">{{ item.description|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 text-success">${{ item.price }}</span>
+                        {% if request.session.current_order_id %}
+                            <a href="{% url 'food_ordering:add_to_order' menu_item_id=item.id %}" 
+                               class="btn btn-sm btn-outline-primary">
+                               <i class="fas fa-plus"></i> Add to Order
+                            </a>
+                        {% else %}
+                            <a href="{% url 'food_ordering:start_order' %}" 
+                               class="btn btn-sm btn-primary">
+                               <i class="fas fa-shopping-cart"></i> Order Now
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> No items available in this category currently.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{% url 'food_ordering:menu' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Full Menu
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

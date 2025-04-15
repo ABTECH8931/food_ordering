@@ -1,0 +1,86 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}Our Menu | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Our Delicious Menu</h1>
+        <p class="lead text-muted">Explore our culinary offerings by category</p>
+    </div>
+
+    {% for category in categories %}
+    <div class="menu-category mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold">
+                <i class="fas fa-utensils me-2"></i>{{ category.name }}
+            </h2>
+            <a href="{% url 'food_ordering:category_menu' category.id %}" class="btn btn-sm btn-outline-primary">
+                View All <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for item in category.available_items %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                        <i class="fas fa-utensils fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="card-text text-muted">{{ item.description|truncatechars:80 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-success">${{ item.price }}</span>
+                            {% if active_order %}
+                            <a href="{% url 'food_ordering:add_item_to_order_form' item.id %}" class="btn btn-sm btn-outline-primary">Add to Order</a>
+                                    <i class="fas fa-plus"></i> Add
+                                </a>
+                            {% else %}
+                                <a href="{% url 'food_ordering:start_order' %}" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-shopping-cart"></i> Order
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No items available in this category.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i> No menu categories available at this time.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .menu-category {
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        background-color: rgba(248, 249, 250, 0.5);
+    }
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

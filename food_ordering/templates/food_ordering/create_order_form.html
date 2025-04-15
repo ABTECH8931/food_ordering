@@ -1,0 +1,14 @@
+{% extends 'food_ordering/base.html' %}
+
+{% block title %}Enter Your Details{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <h1 class="mb-4">Enter Your Contact & Delivery Details</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Proceed to Menu</button>
+        </form>
+    </div>
+{% endblock %}
