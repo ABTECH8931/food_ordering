@@ -24,10 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i6c2vy$3bl0^k_k=1d7(3ceu9k#%t7)x5fxj0s0=(g9fs(rtj1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+CSRF_TRUSTED_ORIGINS = ['https://food-ordering-i1t7.onrender.com']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['food-ordering-i1t7.onrender.com',]
 
+# Dynamic hostname for Render PR previews
+if os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
 
 # Application definition
 
