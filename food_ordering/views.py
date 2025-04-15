@@ -4,8 +4,6 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Prefetch, Sum
 from django.db.models import Q
-from django.contrib.auth.views import LogoutView
-from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import TemplateView
 from .models import Category, MenuItem, Order, OrderItem
@@ -215,10 +213,6 @@ def account_view(request):
         # Include session key for debugging (optional)
         'session_key': request.session.session_key[:8] + '...' if request.session.session_key else None
     })
-
-def order_history(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'food_ordering/order_detail.html', {'order': order})
 
 def create_order_form(request):
     if request.method == 'POST':
